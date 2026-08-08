@@ -66,7 +66,12 @@ use blindroute_core::scheme::FheScheme;
 
 #[wasm_bindgen]
 pub fn demo_ckks_calc(a: f64, b: f64, op: &str) -> JsValue {
-    let params = blindroute_ckks::CkksParams::default();
+    let params = blindroute_ckks::CkksParams {
+        n: 128,
+        q: 0xFFFFFFFF00000001,
+        scale: 16777216.0,  // 2^24 = delta
+        sigma: 3.2,
+    };
     let (sk, pk, ek) = <blindroute_ckks::CkksScheme as FheScheme>::generate_keys(&params);
 
     let enc_a = <blindroute_ckks::CkksScheme as FheScheme>::encode(&params, &[a, b]);
@@ -98,7 +103,13 @@ pub fn demo_ckks_calc(a: f64, b: f64, op: &str) -> JsValue {
 
 #[wasm_bindgen]
 pub fn demo_bfv_calc(a: i64, b: i64, op: &str) -> JsValue {
-    let params = blindroute_bfv::params::BfvParams::default();
+    let params = blindroute_bfv::params::BfvParams {
+        n: 128,
+        q: 0xFFFFFFFF00000001,
+        t: 65537,
+        sigma: 3.2,
+        delta: 0xFFFFFFFF00000001 / 65537,
+    };
     let (sk, pk, ek) = <blindroute_bfv::BfvScheme as FheScheme>::generate_keys(&params);
 
     let enc = <blindroute_bfv::BfvScheme as FheScheme>::encode(&params, &[a as f64, b as f64]);

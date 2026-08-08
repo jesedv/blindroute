@@ -53,7 +53,7 @@
     if (!engine) engine = await loadWasm();
     meanBusy = true; meanResult = null;
     await new Promise((r) => setTimeout(r, 30));
-    try { meanResult = engine.private_mean(parties.map((p) => BigInt(Math.max(0, Math.floor(Number(p)) || 0))), 42n); }
+    try { meanResult = engine.private_mean(parties.map(p => BigInt(Math.floor(Number(p) || 0))), 42n); }
     catch (e) { meanResult = { error: String(e) }; }
     finally { meanBusy = false; }
   }
