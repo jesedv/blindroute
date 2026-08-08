@@ -233,12 +233,23 @@ impl ciphertext::KeyPair {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct CkksParams {
     pub n: usize,
     pub q: u64,
     pub scale: f64,
     pub sigma: f64,
+}
+
+impl Default for CkksParams {
+    fn default() -> Self {
+        CkksParams {
+            n: params::N,
+            q: params::Q,
+            scale: params::DELTA as f64,
+            sigma: params::SIGMA,
+        }
+    }
 }
 
 impl CkksParams {

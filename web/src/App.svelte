@@ -470,6 +470,9 @@
     </div>
 
     {#if demoResult}
+      {#if demoResult.error}
+        <div class="tl-verify warn">Error: {demoResult.error}</div>
+      {:else}
       <div class="timeline">
         <!-- Stage 1: Client Input -->
         <div class="timeline-row client">
@@ -579,6 +582,7 @@
           </div>
         </div>
       </div>
+      {/if}
     {/if}
   </section>
 
@@ -606,6 +610,9 @@
     </div>
 
     {#if bfvDemoResult}
+      {#if bfvDemoResult.error}
+        <div class="tl-verify warn">Error: {bfvDemoResult.error}</div>
+      {:else}
       <div class="timeline">
         <div class="timeline-row client">
           <div class="tl-badge">CLIENT</div>
@@ -652,6 +659,7 @@
           </div>
         </div>
       </div>
+      {/if}
     {/if}
   </section>
 
