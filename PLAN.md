@@ -77,10 +77,27 @@ blindroute/
 | blindroute-ntt | 7 pass |
 | blindroute-core | 6 pass |
 | blindroute-ckks | 15 pass |
-| blindroute-bfv | 9 pass |
+| blindroute-bfv | 9 pass, 2 ignored (CRT chain) |
 | blindroute-ss | 3 pass |
+| blindroute-macros | 1 doctest ignored |
 | blindroute-runtime | — (GPU) |
 | **Total** | **40 pass** |
+
+## Known Limitations
+- **BFV multiply**: Requires CRT modulus chain. Tensor product works but
+  delta² wraps modulo q, corrupting decode. Marked `#[ignore]` for v0.3.
+- **CKKS relinearization noise**: Single-modulus relin adds noise ∝ c2·q.
+  Auxiliary modulus P·Q (planned v0.2) reduces this by factor P.
+- **`circuit!` macro**: Supports `+`, `-`, `*`, float/int literals, `inputs[n]`.
+  Parentheses and grouping supported. No function calls yet.
+
+## Next Priorities
+1. CKKS auxiliary modulus (P·Q) relinearization — dramatic noise reduction
+2. BFV CRT modulus chain — enable integer multiplication
+3. `circuit!` function support — `sigmoid()`, `relu()`, `poly()` for ML
+4. Web demo: network simulation mode (mock HTTP request/response)
+5. Python/Go/JS bindings via UniFFI
+
 
 ## License
 MIT — free for any use, including commercial.
