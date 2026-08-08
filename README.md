@@ -5,9 +5,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-stable-orange.svg)](https://rust-lang.org)
 [![WASM](https://img.shields.io/badge/wasm-102KB-blueviolet.svg)](https://webassembly.org)
-[![Tests](https://img.shields.io/badge/tests-43%20passed-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/tests-47%20passed-brightgreen.svg)]()
 [![CKKS](https://img.shields.io/badge/CKKS-✓-green.svg)]()
-[![BFV](https://img.shields.io/badge/BFV-add%20only-yellow.svg)]()
+[![BFV](https://img.shields.io/badge/BFV-✓-green.svg)]()
 
 **Free, open-source fully homomorphic encryption by [jesed](https://jesed.dev/).**
 
@@ -60,7 +60,7 @@ decrypt the output.
 ## Features
 
 - **Zero-Trust** — Server computes on data it can never read
-- **Dual Scheme** — CKKS (real numbers) + BFV (integers, add verified)
+- **Dual Scheme** — CKKS (real numbers) + BFV (integers, add + mul)
 - **Gadget Relinearization** — wbase=2^16, 4-digit decomposition for low-noise multiplication
 - **Rescaling Chain** — Depth tracking with Δ-based level reduction
 - **Circuit DSL** — `circuit!` macro for declarative arithmetic circuits

@@ -139,7 +139,7 @@ checksum = "b588b76d00fde79687d7646a9b5bdf3cc0f655e0bbd080335a95d7e96f3587da"
 
 [[package]]
 name = "blindroute"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "blindroute-bfv",
  "blindroute-ckks",
@@ -156,7 +156,7 @@ dependencies = [
 
 [[package]]
 name = "blindroute-bfv"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "blindroute-core",
  "blindroute-ntt",
@@ -167,7 +167,7 @@ dependencies = [
 
 [[package]]
 name = "blindroute-ckks"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "blindroute-core",
  "blindroute-ntt",
@@ -179,7 +179,7 @@ dependencies = [
 
 [[package]]
 name = "blindroute-client"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "blindroute-bfv",
  "blindroute-ckks",
@@ -192,7 +192,7 @@ dependencies = [
 
 [[package]]
 name = "blindroute-core"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -200,7 +200,7 @@ dependencies = [
 
 [[package]]
 name = "blindroute-macros"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -209,14 +209,14 @@ dependencies = [
 
 [[package]]
 name = "blindroute-ntt"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "paste",
 ]
 
 [[package]]
 name = "blindroute-runtime"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "blindroute-ntt",
  "bytemuck",
@@ -226,7 +226,7 @@ dependencies = [
 
 [[package]]
 name = "blindroute-server"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "axum",
  "blindroute-bfv",
@@ -241,7 +241,7 @@ dependencies = [
 
 [[package]]
 name = "blindroute-ss"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "getrandom 0.2.17",
  "rand",
@@ -251,7 +251,7 @@ dependencies = [
 
 [[package]]
 name = "blindroute-wasm"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "blindroute-bfv",
  "blindroute-ckks",
