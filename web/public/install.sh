@@ -2,7 +2,7 @@
 set -e
 
 # BlindRoute installer — one-line FHE CLI install
-# Usage: curl -fsSL https://blindroute.jesed.dev/install.sh | sh
+# Usage: curl -fsSL https://raw.githubusercontent.com/jesedv/blindroute/master/install.sh | sh
 
 REPO="jesedv/blindroute"
 BIN="blindroute"

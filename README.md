@@ -167,7 +167,7 @@ const score = client.decrypt(result); // → number
 ### One-line install (Linux/macOS)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jesedv/blindroute/master/install.sh | sh
+curl -fsSL https://blindroute.jesed.dev/install.sh | sh
 ```
 
 ### From source

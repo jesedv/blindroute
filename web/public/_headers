@@ -4,6 +4,11 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
 
+# Install script — text/plain for curl | sh compatibility
+/install.sh
+  Content-Type: text/plain
+  Cache-Control: public, max-age=3600
+
 # WASM — must serve with correct MIME
 /pkg/*.wasm
   Content-Type: application/wasm

@@ -388,7 +388,7 @@
       <div class="card">
         <h3>CLI Binary</h3>
         <p>No Rust needed. <code>keygen</code>, <code>encrypt</code>, <code>compute</code>, <code>decrypt</code>. Prebuilt for Linux, macOS.</p>
-        <code class="mini">curl -fsSL https://raw.githubusercontent.com/jesedv/blindroute/master/install.sh | sh</code>
+        <code class="mini">curl -fsSL https://blindroute.jesed.dev/install.sh | sh</code>
         <a class="btn btn-ghost" href={`${REPO}/releases`} target="_blank" rel="noopener">v0.2.0 Release</a>
       </div>
       <div class="card">
@@ -481,7 +481,7 @@
     <h2>Frequently Asked Questions</h2>
     <dl class="faq">
       <dt>How do I start using BlindRoute?</dt>
-      <dd>One command: <code>curl -fsSL https://raw.githubusercontent.com/jesedv/blindroute/master/install.sh | sh</code>. Then <code>blindroute keygen --out keys/</code>, <code>blindroute encrypt</code>, <code>blindroute compute</code>, <code>blindroute decrypt</code>. No Rust toolchain needed.</dd>
+      <dd>One command: <code>curl -fsSL https://blindroute.jesed.dev/install.sh | sh</code>. Then <code>blindroute keygen --out keys/</code>, <code>blindroute encrypt</code>, <code>blindroute compute</code>, <code>blindroute decrypt</code>. No Rust toolchain needed.</dd>
       <dt>Is this actually full FHE?</dt>
       <dd>Yes. The CKKS scheme performs encode, encrypt, decrypt, homomorphic addition, and homomorphic multiplication on genuine RLWE ciphertexts. GPU NTT shaders are live; modulus switching is on the roadmap.</dd>
       <dt>Do I need a GPU?</dt>

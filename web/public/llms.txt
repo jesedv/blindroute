@@ -19,7 +19,7 @@ BlindRoute wraps any arithmetic API in Fully Homomorphic Encryption (FHE) so the
 
 ## Quick Start
 ```
-curl -fsSL https://raw.githubusercontent.com/jesedv/blindroute/master/install.sh | sh
+curl -fsSL https://blindroute.jesed.dev/install.sh | sh
 blindroute keygen --out keys/
 blindroute encrypt --pub keys/pub.json --in data.json --out ct.json
 blindroute compute add ct.json ct.json --out sum.json
