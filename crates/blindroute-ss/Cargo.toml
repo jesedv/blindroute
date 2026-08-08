@@ -1,0 +1,20 @@
+[package]
+name = "blindroute-ss"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Threshold secret sharing for private aggregation"
+repository.workspace = true
+readme.workspace = true
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+rand.workspace = true
+rand_pcg.workspace = true
+serde.workspace = true
+getrandom.workspace = true
+
+[features]
+default = []

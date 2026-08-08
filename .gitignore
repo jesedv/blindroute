@@ -1,0 +1,17 @@
+# Rust
+/target
+**/*.rs.bk
+
+# Web build artifacts (WASM pkg is tracked for Cloudflare Pages deploys)
+web/node_modules
+web/dist
+
+# Env / OS
+*.env
+.DS_Store
+Thumbs.db
+
+# Editors / IDEs
+.idea/
+.vscode/
+*.swp

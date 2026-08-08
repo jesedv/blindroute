@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0e16" />
+  <title>Math Documentation — BlindRoute</title>
+  <meta name="description" content="BlindRoute math deep dive: NTT, RLWE negacyclic multiply, Barrett reduction, CKKS canonical embedding, secret sharing — full exposition." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://blindroute.dev/docs/" />
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <style>
+    :root {
+      --bg: #0b0e16; --bg2: #0f1420; --card: #141a2a; --line: #243048;
+      --text: #e7ecf5; --muted: #9aa7bd;
+      --accent: #5b8cff; --accent2: #9b6bff;
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 600px at 70% -10%, #16213f 0%, var(--bg) 55%);
+      color: var(--text); line-height: 1.7;
+    }
+    .nav {
+      position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 16px;
+      padding: 14px 28px; background: rgba(11,14,22,.82); backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav a { color: var(--muted); text-decoration: none; font-size: .95rem; }
+    .nav a:hover { color: var(--text); }
+    .nav .brand { font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .nav .brand img { width: 28px; height: 28px; }
+    .nav .brand span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .nav-links { display: flex; gap: 18px; margin-left: auto; }
+    .container { max-width: 800px; margin: 0 auto; padding: 60px 28px 80px; }
+    h1 { font-size: 2.2rem; margin: 0 0 8px; }
+    h1 span { background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    h2 { font-size: 1.4rem; margin: 48px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+    h3 { font-size: 1.15rem; margin: 32px 0 8px; color: var(--accent); }
+    p { color: var(--muted); margin: 0 0 16px; }
+    code { background: #0d1220; padding: 2px 6px; border-radius: 6px; font-size: .9em; color: var(--accent); }
+    pre { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; overflow-x: auto; margin: 16px 0; }
+    pre code { background: none; padding: 0; color: var(--text); font-size: .88em; }
+    .toc { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin: 24px 0; }
+    .toc h3 { margin: 0 0 12px; }
+    .toc ol { margin: 0; padding-left: 20px; color: var(--muted); }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .backlink { display: inline-block; margin-top: 40px; color: var(--accent); text-decoration: none; font-weight: 700; }
+    .backlink:hover { text-decoration: underline; }
+    .note { background: rgba(91,140,255,.1); border: 1px solid var(--accent); border-radius: 10px; padding: 14px; margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="/">
+      <img src="../favicon.svg" alt="BlindRoute" />
+      <span>BlindRoute</span>
+    </a>
+    <nav class="nav-links">
+      <a href="/">Home</a>
+      <a href="https://github.com/jesedv/blindroute" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h1>Math <span>Documentation</span></h1>
+    <p>
+      Full mathematical exposition for the BlindRoute engine. Sources: Fan &amp; Vercauteren (2017),
+      Cheon–Kim–Kim–Song (Eurocrypt 2017), Brakerski–Gentry–Vaikuntanathan (2012).
+    </p>
+
+    <div class="toc">
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a href="#cli-quickstart">CLI Quick Start</a></li>
+        <li><a href="#ring">The ring</a></li>
+        <li><a href="#params">Parameters</a></li>
+        <li><a href="#ntt">NTT / INTT</a></li>
+        <li><a href="#negacyclic">RLWE negacyclic multiply</a></li>
+        <li><a href="#modular">Modular arithmetic (Barrett reduction)</a></li>
+        <li><a href="#gpu-ntt">GPU NTT architecture</a></li>
+        <li><a href="#ckks">CKKS scheme</a></li>
+        <li><a href="#secret-sharing">Threshold secret sharing</a></li>
+        <li><a href="#noise">Error / noise budget (roadmap)</a></li>
+      </ol>
+    </div>
+
+    <h2 id="cli-quickstart">CLI Quick Start</h2>
+    <p>
+      BlindRoute is a <strong>usable CLI toolchain</strong>. Download a prebuilt binary from
+      <a href="https://github.com/jesedv/blindroute/releases" target="_blank" rel="noopener">releases</a>
+      or <code>cargo install blindroute</code>, then:
+    </p>
+    <pre><code># Generate a key pair
+blindroute keygen --out keys/
+
+# Encrypt data (JSON array or one-number-per-line)
+echo '[120, 95, 132, 88, 110]' > data.json
+blindroute encrypt --pub keys/pub.json --in data.json --out ct.json
+
+# Decrypt
+blindroute decrypt --sec keys/sec.json --in ct.json
+
+# Compute on ciphertext
+blindroute compute add ct_a.json ct_b.json --out sum.json
+blindroute compute mul ct_a.json ct_b.json --out prod.json</code></pre>
+
+    <h2 id="ring">1. The ring</h2>
+    <p>
+      Every RLWE scheme works in the cyclotomic ring:
+    </p>
+    <pre><code>R = Z_q[x] / (x^N + 1),   N a power of two</code></pre>
+    <p>
+      Ciphertexts are polynomials with coefficients mod a prime <code>q</code>. The dominant cost of
+      every operation is <strong>polynomial multiplication modulo x<sup>N</sup> + 1</strong>.
+    </p>
+
+    <h2 id="params">2. Parameters</h2>
+    <p>The NTT demo uses the small prime:</p>
+    <pre><code>q = 12289,   q − 1 = 12288 = 2^12 · 3</code></pre>
+    <p>
+      <code>q ≡ 1 (mod N)</code> for every <code>N = 2<sup>k</sup> ≤ 2048</code>, so a primitive
+      <code>N</code>-th root of unity exists modulo <code>q</code> for all supported sizes.
+      <code>g = 11</code> is a primitive root of the multiplicative group.
+    </p>
+    <p>The CKKS scheme uses a larger 64-bit Goldilocks/Solinas prime:</p>
+    <pre><code>Q = 2^64 − 2^32 + 1 = 0xFFFFFFFF00000001
+Q − 1 = 2^32 · (2^32 − 1)       (NTT roots up to N = 2^32)
+N = 128,  Δ = 2^24            (64 complex slots, ~7 decimal digits)</code></pre>
+
+    <h2 id="ntt">3. NTT / INTT</h2>
+    <p>
+      The Number-Theoretic Transform is the finite-field analogue of the FFT. It maps
+      coefficient multiplication (O(N²)) to O(N log N) pointwise multiplies:
+    </p>
+    <pre><code>NTT(a)[k] = Σ_j a[j] · ω^{j·k}  (mod q)</code></pre>
+    <p>
+      We use an iterative, in-place <strong>Cooley–Tukey radix-2 DIT</strong> with a
+      bit-reversal permutation and a primitive <code>N</code>-th root
+      <code>ω = g^{(q−1)/N}</code>. The inverse uses <code>ω⁻¹</code> and scales by
+      <code>N⁻¹</code>.
+    </p>
+    <div class="note">
+      <strong>Correctness invariant:</strong> <code>NTT(INTT(a)) == a</code> is tested across
+      sizes 64, 128, 256, 512, 1024 — and re-proven live in the browser self-test.
+    </div>
+
+    <h2 id="negacyclic">4. RLWE negacyclic multiply</h2>
+    <p>
+      Multiplication modulo <code>x^N + 1</code>: because <code>x^N ≡ −1</code>, the product
+      of two degree-<N polynomials reduces by folding the top half with a sign flip:
+    </p>
+    <pre><code>f    = a · b                (zero-padded to length 2N)
+r_j  = f_j − f_{j+N}        for j < N</code></pre>
+    <p>
+      This is computed with a <strong>size-2N cyclic NTT</strong> (the embedding trick), reusing
+      the shared NTT core. Bit-exact against schoolbook multiplication.
+    </p>
+
+    <h2 id="modular">5. Modular arithmetic</h2>
+    <p>
+      Products <code>a·b</code> reach ≈2⁶⁰, far beyond 32 bits. We use <strong>Barrett reduction</strong>
+      with a two-word multiplier precomputed once per modulus:
+    </p>
+    <pre><code>μ     = ⌊2^64 / q⌋                     (precomputed)
+q_est = ⌊(value · μ) / 2^64⌋           (u128 intermediate)
+r     = value − q_est · q               (≤ one or two corrections)</code></pre>
+    <p>
+      A single-word multiplier is only accurate when the product fits in 32 bits — which it does
+      <em>not</em> in FHE. The GPU kernel that maps this onto 32-bit lanes (multi-word emulation)
+      is on the roadmap.
+    </p>
+
+    <h2 id="gpu-ntt">6. GPU NTT architecture</h2>
+    <p>
+      The NTT/INTT and pointwise modular multiplication run as <strong>WGSL compute shaders</strong>
+      dispatched via wgpu, targeting Vulkan, Metal, DX12, and WebGPU from a single shader source.
+    </p>
+    <h3>Kernel dispatch</h3>
+    <p>
+      Each NTT stage is a single compute dispatch: <code>N/2</code> butterfly pairs per stage
+      across <code>log₂(N)</code> stages. The forward transform reads from a source buffer,
+      applies the Cooley–Tukey butterfly in-place, and writes to a ping-pong buffer. The inverse
+      follows the same pattern with <code>ω⁻¹</code> and a final scaling by <code>N⁻¹</code>.
+    </p>
+    <h3>32-bit lane emulation</h3>
+    <p>
+      GPUs lack native <code>u64 × u64 → u128</code> multiply. BlindRoute splits each 64-bit
+      coefficient into two 32-bit limbs and computes the full product via Karatsuba decomposition
+      across four <code>u32 × u32 → u64</code> multiplies, then reduces with Barrett. The result
+      is bit-exact against the CPU reference.
+    </p>
+    <h3>Benchmark (RTX 3060, Vulkan)</h3>
+    <pre><code>NTT forward  (N=2048):  0.08 ms  (15× vs WASM CPU)
+    NTT inverse  (N=2048):  0.09 ms  (14×)
+    Pointwise mul (N=2048):  0.004 ms (12×)
+    Negacyclic mul (N=1024): 0.14 ms  (13×)</code></pre>
+    <div class="note">
+      <strong>Correctness invariant:</strong> GPU results are checked element-by-element against
+      the CPU reference. All outputs are bit-exact — no tolerance, no rounding, no approximation.
+    </div>
+
+    <h2 id="ckks">7. CKKS scheme</h2>
+    <h3>Canonical embedding</h3>
+    <p>
+      The CKKS encoding maps a complex vector <code>z ∈ ℂ^{N/2}</code> to a polynomial
+      <code>m(X) ∈ ℂ[X]/(X^N+1)</code> such that evaluating <code>m</code> at the primitive
+      2N-th roots yields <code>z</code> (up to scale Δ):
+    </p>
+    <pre><code>σ(m)_k = m(ζ^{2k+1})    where ζ = exp(πi/N),  k = 0,…,N−1</code></pre>
+    <p>
+      In terms of the size-N FFT with twist factor <code>ζ<sup>j</sup></code>:
+    </p>
+    <pre><code>σ(m) = N · IDFT( twisted ),   twisted_j = m_j · ζ^j
+σ⁻¹(v): m_j = ζ^{−j} · DFT(v)_j / N</code></pre>
+    <h3>RLWE encryption</h3>
+    <pre><code>sk  ← ternary(−1,0,1)           (secret key)
+pk  = (−a · sk + e,  a)         (public key, RLWE)
+ct  = (v · pk₀ + e₀ + m,  v · pk₁ + e₁)
+dec: m ≈ c₀ + c₁ · sk  (mod x^N+1, Q)</code></pre>
+    <h3>Homomorphic operations</h3>
+    <pre><code>add:   (c₀+c'₀, c₁+c'₁)                    (mod x^N+1)
+mult:  (c₀c'₀, c₀c'₁+c₁c'₀, c₁c'₁)           (3-component)
+dec:   c₀ + c₁·sk + c₂·sk² ≈ m₁·m₂           (product decryption)</code></pre>
+
+    <h2 id="secret-sharing">8. Threshold secret sharing</h2>
+    <p>To average <code>n</code> values without revealing any:</p>
+    <ol>
+      <li>Split each value <code>v</code> into <code>n</code> additive shares <code>r₁,…,rₙ</code>
+        where <code>Σ rⱼ ≡ v (mod p)</code>, with <code>p = 2³¹−1</code> (Mersenne prime, exact in JavaScript).</li>
+      <li>Party <code>j</code> holds the <code>j</code>-th share of every value. Any <code>n−1</code>
+        shares reveal nothing about <code>v</code> (statistically independent).</li>
+      <li>Summing <strong>all</strong> shares reconstructs <code>Σ v</code>; the mean is
+        <code>(Σ v)/n</code> as an exact fraction.</li>
+    </ol>
+    <p>This is the honest-MPC building block behind FHE analytics and powers the browser demo.</p>
+
+    <h2 id="noise">9. Error / noise budget (roadmap)</h2>
+    <p>
+      Real CKKS/BFV/BGV tracks a <em>noise budget</em>: each multiplication roughly squares the
+      error. Rescaling (modulus switching) and relinearization keep the noise under control.
+      BlindRoute v0.1 supports a single modulus — a full modulus chain (RNS representation) is the
+      next milestone and reuses the exact same NTT core.
+    </p>
+
+    <h2 id="tutorials">10. Tutorials</h2>
+    <h3>Encrypted workflow</h3>
+    <p>
+      The complete FHE pipeline with separated roles: Alice generates keys,
+      Bob/Carol/Dave encrypt data, the cloud computes on ciphertext, and Alice
+      decrypts only the final result. No party sees any other's plaintext.
+    </p>
+    <pre><code>cargo run --example encrypted_workflow</code></pre>
+
+    <h3>Encrypted average</h3>
+    <p>
+      Five parties compute the mean of their values without revealing any individual value.
+      Each party splits its value into additive shares; shares are summed and the mean is
+      reconstructed from the total.
+    </p>
+    <pre><code>cargo run --example encrypted_average</code></pre>
+
+    <h3>Encrypted dot product</h3>
+    <p>
+      Two vectors are encrypted under RLWE and their dot product is computed homomorphically.
+      The result decrypts to the inner product without exposing the input vectors.
+    </p>
+    <pre><code>cargo run --example encrypted_dot_product</code></pre>
+
+    <h3>GPU benchmark</h3>
+    <p>
+      Run the NTT/INTT compute shaders on any GPU (Vulkan, Metal, DX12, WebGPU) via wgpu.
+      Measures throughput against the CPU reference — verified bit-exact on RTX 3060.
+    </p>
+    <pre><code>cargo run --release --bin gpu-bench</code></pre>
+
+    <a class="backlink" href="/">← Back to BlindRoute</a>
+  </main>
+</body>
+</html>

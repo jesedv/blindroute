@@ -1,0 +1,16 @@
+[package]
+name = "blindroute-runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "GPU-accelerated FHE runtime via wgpu"
+repository.workspace = true
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+blindroute-ntt.workspace = true
+wgpu = "22"
+bytemuck = { version = "1", features = ["derive"] }
+pollster = "0.3"

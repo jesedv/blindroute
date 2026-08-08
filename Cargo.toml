@@ -1,0 +1,81 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/blindroute-ntt",
+    "crates/blindroute-ss",
+    "crates/blindroute-ckks",
+    "crates/blindroute-runtime",
+    "crates/blindroute-wasm",
+    "crates/blindroute-core",
+    "crates/blindroute-bfv",
+    "crates/blindroute-server",
+    "crates/blindroute-client",
+    ".",
+]
+default-members = ["."]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["blindroute contributors"]
+readme = "README.md"
+repository = "https://github.com/jesedv/blindroute"
+homepage = "https://blindroute.dev/"
+description = "Zero-Trust FHE API Middleware — your server never sees plaintext. Built on CKKS + BFV with GPU-accelerated NTT."
+
+[workspace.dependencies]
+blindroute-ntt = { path = "crates/blindroute-ntt" }
+blindroute-ss = { path = "crates/blindroute-ss" }
+blindroute-ckks = { path = "crates/blindroute-ckks" }
+blindroute-core = { path = "crates/blindroute-core" }
+blindroute-bfv = { path = "crates/blindroute-bfv" }
+num-complex = "0.4"
+serde = { version = "1", features = ["derive"] }
+rand = "0.8"
+rand_pcg = "0.3"
+paste = "1"
+wasm-bindgen = "0.2"
+js-sys = "0.3"
+web-sys = "0.3"
+console_error_panic_hook = "0.1"
+serde-wasm-bindgen = "0.6"
+getrandom = { version = "0.2", features = ["js"] }
+serde_json = "1"
+
+[package]
+name = "blindroute"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+readme = "README.md"
+default-run = "blindroute"
+
+[dependencies]
+blindroute-ntt.workspace = true
+blindroute-ss.workspace = true
+blindroute-ckks.workspace = true
+blindroute-runtime = { path = "crates/blindroute-runtime" }
+paste.workspace = true
+rand.workspace = true
+rand_pcg.workspace = true
+serde.workspace = true
+serde_json = "1"
+
+[[bin]]
+name = "blindroute"
+path = "src/main.rs"
+
+[[bin]]
+name = "gpu-bench"
+path = "src/gpu_bench.rs"
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
+
+[profile.bench]
+lto = true
+codegen-units = 1

@@ -1,0 +1,26 @@
+[package]
+name = "blindroute-wasm"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Browser WASM bridge for BlindRoute — CKKS + BFV + secret sharing"
+repository.workspace = true
+readme.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+blindroute-ntt.workspace = true
+blindroute-ss.workspace = true
+blindroute-ckks.workspace = true
+blindroute-bfv.workspace = true
+blindroute-core.workspace = true
+serde.workspace = true
+serde-wasm-bindgen.workspace = true
+wasm-bindgen.workspace = true
+js-sys.workspace = true
+console_error_panic_hook.workspace = true
+
+[features]
+default = []

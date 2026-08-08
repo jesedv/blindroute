@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0e16" />
+
+    <!-- Primary SEO -->
+    <title>BlindRoute — Cross-Vendor Fully Homomorphic Encryption on GPU</title>
+    <meta
+      name="description"
+      content="BlindRoute computes on encrypted data without ever decrypting it. A free, open-source, browser-native NTT + threshold-secret-sharing engine (RLWE / CKKS / BFV-style) that runs on any GPU vendor and in the browser via WASM. Live demo included."
+    />
+    <meta
+      name="keywords"
+      content="FHE, fully homomorphic encryption, GPU, NTT, number theoretic transform, RLWE, CKKS, BFV, privacy, encrypted analytics, private mean, secret sharing, WASM, WebGPU, homomorphic encryption"
+    />
+    <meta name="author" content="blindroute contributors" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://blindroute.dev/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://blindroute.dev/" />
+    <meta property="og:title" content="BlindRoute — Fully Homomorphic Encryption on GPU" />
+    <meta
+      property="og:description"
+      content="Compute on encrypted data without decrypting. Free, open-source, browser-native NTT + secret-sharing FHE engine for every GPU vendor + WASM."
+    />
+    <meta property="og:site_name" content="BlindRoute" />
+    <meta property="og:image" content="https://blindroute.dev/og-cover.svg" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BlindRoute — Fully Homomorphic Encryption on GPU" />
+    <meta
+      name="twitter:description"
+      content="Compute on encrypted data without decrypting. Free, open-source, browser-native FHE engine across GPU vendors + WASM. Live demo."
+    />
+    <meta name="twitter:image" content="https://blindroute.dev/og-cover.svg" />
+
+    <!-- GitHub -->
+    <meta property="github:repo" content="jesedv/blindroute" />
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareSourceCode",
+        "name": "BlindRoute",
+        "alternateName": "blindroute",
+        "description": "Cross-vendor fully homomorphic encryption on GPU: an NTT + NTT/INTT core (RLWE / CKKS / BFV-style ring Z_q[x]/(x^N+1)), 32-bit emulated 64-bit modular arithmetic, and threshold secret-sharing, with a browser-native WASM demo.",
+        "codeRepository": "https://github.com/jesedv/blindroute",
+        "license": "https://opensource.org/licenses/MIT",
+        "programmingLanguage": "Rust",
+        "operatingSystem": "Cross-platform, WebAssembly, GPU (Vulkan/Metal/DX12/WebGPU)",
+        "applicationCategory": "SecurityApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "isAccessibleForFree": true
+      }
+    </script>
+
+    <link rel="sitemap" href="https://blindroute.dev/sitemap.xml" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  </head>
+  <body>
+    <noscript>
+      <h1>BlindRoute — Fully Homomorphic Encryption on GPU</h1>
+      <p>
+        BlindRoute computes on encrypted data without ever decrypting it: a free, open-source,
+        browser-native engine (RLWE / CKKS / BFV-style ring Z_q[x]/(x^N+1)) built on an NTT /
+        INTT core with a threshold secret-sharing "private mean" demo. Runs on any GPU vendor
+        and in the browser via WASM.
+      </p>
+      <ul>
+        <li>NTT / INTT over Z_q with 32-bit-emulated 64-bit modular arithmetic.</li>
+        <li>RLWE negacyclic polynomial multiply mod x^N+1.</li>
+        <li>Threshold secret sharing: compute a mean from N parties revealing nothing.</li>
+        <li>WASM build verified live, in your browser.</li>
+      </ul>
+      <p>
+        Source: <a href="https://github.com/jesedv/blindroute">github.com/jesedv/blindroute</a>
+      </p>
+    </noscript>
+
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
