@@ -9,6 +9,8 @@
 [![CKKS](https://img.shields.io/badge/CKKS-✓-green.svg)]()
 [![BFV](https://img.shields.io/badge/BFV-add%20only-yellow.svg)]()
 
+**Free, open-source fully homomorphic encryption by [jesed](https://jesed.dev/).**
+
 BlindRoute wraps any arithmetic API in **Fully Homomorphic Encryption (FHE)** so
 the server computes on encrypted data without ever decrypting it. Even if
 attackers intercept traffic, compromise the database, or take over the server —
@@ -132,8 +134,7 @@ const score = client.decrypt(result); // → number
 
 ## Live Demo
 
-Visit [blindroute.dev](https://blindroute.dev) for an in-browser WASM demo showing
-the full FHE pipeline: **input → encrypt → compute → decrypt → result**.
+→ **[blindroute.jesed.dev](https://blindroute.jesed.dev)** — Interactive WASM FHE calculator showing the full pipeline: input → encrypt → compute → decrypt → result. Switch between CKKS (real numbers) and BFV (integers).
 
 ---
 

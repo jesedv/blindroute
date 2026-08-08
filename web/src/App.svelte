@@ -20,7 +20,7 @@
   let mobileMenu = $state(false);
 
   const REPO = 'https://github.com/jesedv/blindroute';
-  const DOMAIN = 'https://blindroute.dev';
+  const DOMAIN = 'https://blindroute.jesed.dev';
   const DOCS = '/docs/';
 
   onMount(async () => {

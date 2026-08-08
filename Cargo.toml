@@ -22,7 +22,7 @@ license = "MIT"
 authors = ["blindroute contributors"]
 readme = "README.md"
 repository = "https://github.com/jesedv/blindroute"
-homepage = "https://blindroute.dev/"
+homepage = "https://blindroute.jesed.dev/"
 description = "Zero-Trust FHE API Middleware — your server never sees plaintext. Built on CKKS + BFV with GPU-accelerated NTT."
 
 [workspace.dependencies]

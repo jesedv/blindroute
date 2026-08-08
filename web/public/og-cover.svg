@@ -24,5 +24,5 @@
   </g>
   <text x="600" y="370" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="64" font-weight="800" fill="url(#a)">BlindRoute</text>
   <text x="600" y="420" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="24" fill="#9aa7bd">Compute on encrypted data. Without ever decrypting it.</text>
-  <text x="600" y="560" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="16" fill="#5b8cff">blindroute.dev</text>
+  <text x="600" y="560" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="16" fill="#5b8cff">blindroute.jesed.dev</text>
 </svg>
