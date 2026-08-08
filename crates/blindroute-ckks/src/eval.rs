@@ -82,11 +82,9 @@ pub fn negate(ct: &Ciphertext) -> Ciphertext {
 
     for (i, (k0, k1)) in ek.k.iter().enumerate() {
         let factor = ek.wbase.pow(i as u32);
-        let c2_digit: Vec<u64> = if ek.wbase_len == 1 {
-            c2.clone()
-        } else {
-            c2.iter().map(|&x| (x / factor) % ek.wbase).collect()
-        };
+        let c2_digit: Vec<u64> = c2.iter()
+            .map(|&x| (x / factor) % ek.wbase)
+            .collect();
         let k0_c2 = blindroute_ntt::mul_negacyclic_with_root(k0, &c2_digit, n, root2, q);
         c0_new = params::poly_add(&c0_new, &k0_c2, q);
         let k1_c2 = blindroute_ntt::mul_negacyclic_with_root(k1, &c2_digit, n, root2, q);
@@ -172,11 +170,20 @@ mod tests {
         let ct_a = encrypt(&kp.pk, &enc_a, SCALE, 0xA001);
         let ct_b = encrypt(&kp.pk, &enc_b, SCALE, 0xA002);
         let ct_prod = multiply(&ct_a, &ct_b);
-        assert!(ct_prod.c2.is_some(), "product must have c2");
+        assert!(ct_prod.c2.is_some());
 
         let ct_relin = relinearize(&ct_prod, &kp.ek);
-        assert!(ct_relin.c2.is_none(), "relinearized CT must not have c2");
-        assert_eq!(ct_relin.level, ct_prod.level, "relinearization preserves level");
+        assert!(ct_relin.c2.is_none());
+        assert_eq!(ct_relin.level, ct_prod.level);
+
+        let dec = decrypt(&ct_relin, &kp.sk);
+        let decoded = encode::decode_real(&dec, SCALE * SCALE);
+
+        let expected = [10.0, 18.0, 28.0];
+        for (i, e) in expected.iter().enumerate() {
+            assert!((decoded[i] - e).abs() < 20.0,
+                "slot {}: got {:.4}, expected {}", i, decoded[i], e);
+        }
     }
 
     #[test]

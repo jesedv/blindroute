@@ -175,6 +175,50 @@ impl Circuit {
             })
             .count()
     }
+
+    pub fn linear_combination(&mut self, inputs: &[usize], weights: &[f64]) -> usize {
+        assert_eq!(inputs.len(), weights.len(), "inputs and weights must match");
+        let mut sum = self.const_f64(0.0);
+        for (i, (&inp, &w)) in inputs.iter().zip(weights.iter()).enumerate() {
+            let w_node = self.const_f64(w);
+            let term = self.mul(inp, w_node);
+            sum = self.add(sum, term);
+        }
+        sum
+    }
+
+    pub fn sigmoid_approx_3(&mut self, x: usize) -> usize {
+        let half = self.const_f64(0.5);
+        let quarter = self.const_f64(0.25);
+        let x_sq = self.mul(x, x);
+        let x_cu = self.mul(x_sq, x);
+        let t1 = self.mul(x, quarter);
+        let t2_coeff = self.const_f64(1.0 / 48.0);
+        let t2 = self.mul(x_cu, t2_coeff);
+        let term = self.sub(t1, t2);
+        self.add(half, term)
+    }
+
+    pub fn sigmoid_approx_5(&mut self, x: usize) -> usize {
+        let half = self.const_f64(0.5);
+        let c1 = self.const_f64(0.25);
+        let c3 = self.const_f64(1.0 / 48.0);
+        let c5 = self.const_f64(1.0 / 480.0);
+        let x2 = self.mul(x, x);
+        let x3 = self.mul(x2, x);
+        let x4 = self.mul(x3, x);
+        let x5 = self.mul(x4, x);
+        let t1 = self.mul(x, c1);
+        let t3 = self.mul(x3, c3);
+        let t5 = self.mul(x5, c5);
+        let sum = self.add(t1, t5);
+        let sum = self.sub(sum, t3);
+        self.add(half, sum)
+    }
+
+    pub fn relu_approx_square(&mut self, x: usize) -> usize {
+        self.mul(x, x)
+    }
 }
 
 #[cfg(test)]
@@ -241,5 +285,31 @@ mod tests {
 
         assert!(matches!(c.nodes[cst], Node::ConstF64(3.0)));
         assert_eq!(c.nodes[add].dependencies(), vec![0, cst]);
+    }
+
+    #[test]
+    fn sigmoid_approx_3_depth() {
+        let mut c = Circuit::new(1);
+        let out = c.sigmoid_approx_3(0);
+        c.output(out);
+        assert!(c.multiplicative_depth() >= 2);
+        assert!(c.op_count() >= 4);
+    }
+
+    #[test]
+    fn sigmoid_approx_5_depth() {
+        let mut c = Circuit::new(1);
+        let out = c.sigmoid_approx_5(0);
+        c.output(out);
+        assert!(c.multiplicative_depth() >= 3);
+        assert!(c.op_count() >= 6);
+    }
+
+    #[test]
+    fn linear_combination() {
+        let mut c = Circuit::new(3);
+        let out = c.linear_combination(&[0, 1, 2], &[0.6, 0.3, 0.1]);
+        c.output(out);
+        assert!(c.op_count() >= 5);
     }
 }
