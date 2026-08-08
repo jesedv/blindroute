@@ -58,6 +58,8 @@ default-run = "blindroute"
 blindroute-ntt.workspace = true
 blindroute-ss.workspace = true
 blindroute-ckks.workspace = true
+blindroute-core.workspace = true
+blindroute-bfv.workspace = true
 blindroute-runtime = { path = "crates/blindroute-runtime" }
 paste.workspace = true
 rand.workspace = true

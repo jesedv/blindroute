@@ -85,9 +85,10 @@ pub fn demo_ckks_calc(a: f64, b: f64, op: &str) -> JsValue {
         }
         _ => ct.clone(),
     };
+    let decode_scale = if op == "mul" { params.scale * params.scale } else { params.scale };
 
     let dec = <blindroute_ckks::CkksScheme as FheScheme>::decrypt(&sk, &ct_result);
-    let decoded = <blindroute_ckks::CkksScheme as FheScheme>::decode(&params, &dec, 1);
+    let decoded = blindroute_ckks::encode::decode_real(&dec, decode_scale);
 
     serde_wasm_bindgen::to_value(&DemoResult {
         input_a: a,
