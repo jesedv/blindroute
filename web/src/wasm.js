@@ -16,7 +16,7 @@ export function loadWasm() {
   if (!instancePromise) {
     let base = document.baseURI;
     if (!base.endsWith('/')) base = new URL('./', base).href;
-    const url = new URL('pkg/blindroute_wasm.js', base).href;
+    const url = new URL('pkg/blindroute_wasm.js?v=021', base).href;
     instancePromise = import(/* @vite-ignore */ url).then(async (mod) => {
       await mod.default();
       return mod;

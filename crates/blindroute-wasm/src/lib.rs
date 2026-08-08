@@ -66,28 +66,30 @@ use blindroute_core::scheme::FheScheme;
 
 #[wasm_bindgen]
 pub fn demo_ckks_calc(a: f64, b: f64, op: &str) -> JsValue {
-    let params = blindroute_ckks::CkksParams {
-        n: 128,
-        q: 0xFFFFFFFF00000001,
-        scale: 16777216.0,  // 2^24 = delta
-        sigma: 3.2,
-    };
-    let (sk, pk, ek) = <blindroute_ckks::CkksScheme as FheScheme>::generate_keys(&params);
+    let scheme = blindroute_ckks::CkksScheme::new();
+    let kp = blindroute_ckks::key::generate_keys(0xCAFE);
+    let scale = blindroute_ckks::params::DELTA as f64;
 
-    let enc_a = <blindroute_ckks::CkksScheme as FheScheme>::encode(&params, &[a, b]);
-    let ct = <blindroute_ckks::CkksScheme as FheScheme>::encrypt(&pk, &enc_a);
+    // Encode: pad to N/2=64 slots via scheme's own padding logic
+    let n2 = blindroute_ckks::params::N / 2;
+    let mut message = vec![0.0f64; n2];
+    message[0] = a;
+    message[1] = b;
+    let enc = blindroute_ckks::encode::encode_real(&message, scale);
+
+    let ct = blindroute_ckks::encrypt::encrypt(&kp.pk, &enc, scale, 0x42);
 
     let ct_result = match op {
-        "add" => <blindroute_ckks::CkksScheme as FheScheme>::add(&ek, &ct, &ct),
+        "add" => blindroute_ckks::eval::add(&ct, &ct),
         "mul" => {
-            let mul = <blindroute_ckks::CkksScheme as FheScheme>::multiply(&ek, &ct, &ct);
-            <blindroute_ckks::CkksScheme as FheScheme>::relinearize(&ek, &mul)
+            let mul = blindroute_ckks::eval::multiply(&ct, &ct);
+            blindroute_ckks::eval::relinearize(&mul, &kp.ek)
         }
         _ => ct.clone(),
     };
-    let decode_scale = if op == "mul" { params.scale * params.scale } else { params.scale };
+    let decode_scale = if op == "mul" { scale * scale } else { scale };
 
-    let dec = <blindroute_ckks::CkksScheme as FheScheme>::decrypt(&sk, &ct_result);
+    let dec = blindroute_ckks::eval::decrypt(&ct_result, &kp.sk);
     let decoded = blindroute_ckks::encode::decode_real(&dec, decode_scale);
 
     serde_wasm_bindgen::to_value(&DemoResult {

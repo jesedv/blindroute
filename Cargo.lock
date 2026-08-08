@@ -251,7 +251,7 @@ dependencies = [
 
 [[package]]
 name = "blindroute-wasm"
-version = "0.2.0"
+version = "0.1.0"
 dependencies = [
  "blindroute-bfv",
  "blindroute-ckks",

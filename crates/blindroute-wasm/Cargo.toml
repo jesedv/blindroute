@@ -1,6 +1,6 @@
 [package]
 name = "blindroute-wasm"
-version = "0.2.0"
+version.workspace = true
 edition.workspace = true
 license.workspace = true
 description = "Browser WASM bridge for BlindRoute — CKKS + BFV + secret sharing"
