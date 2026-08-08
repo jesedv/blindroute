@@ -67,22 +67,25 @@ pub fn demo_ckks_calc(a: f64, b: f64, op: &str) -> JsValue {
     use blindroute_ckks::{key, encode, encrypt, eval, params};
     let kp = key::generate_keys(0xCAFE);
     let scale = params::DELTA as f64;
-
     let n2 = params::N / 2;
-    let mut message = vec![0.0f64; n2];
-    message[0] = a;
-    message[1] = b;
-    let enc = encode::encode_real(&message, scale);
 
-    let ct = encrypt::encrypt(&kp.pk, &enc, scale, 0x42);
+    let mut msg_a = vec![0.0f64; n2];
+    msg_a[0] = a;
+    let enc_a = encode::encode_real(&msg_a, scale);
+    let ct_a = encrypt::encrypt(&kp.pk, &enc_a, scale, 0x42);
+
+    let mut msg_b = vec![0.0f64; n2];
+    msg_b[0] = b;
+    let enc_b = encode::encode_real(&msg_b, scale);
+    let ct_b = encrypt::encrypt(&kp.pk, &enc_b, scale, 0x43);
 
     let ct_result = match op {
-        "add" => eval::add(&ct, &ct),
+        "add" => eval::add(&ct_a, &ct_b),
         "mul" => {
-            let mul = eval::multiply(&ct, &ct);
+            let mul = eval::multiply(&ct_a, &ct_b);
             eval::relinearize(&mul, &kp.ek)
         }
-        _ => ct.clone(),
+        _ => ct_a.clone(),
     };
     let decode_scale = if op == "mul" { scale * scale } else { scale };
 
@@ -90,14 +93,14 @@ pub fn demo_ckks_calc(a: f64, b: f64, op: &str) -> JsValue {
     let decoded = encode::decode_real(&dec, decode_scale);
 
     serde_wasm_bindgen::to_value(&DemoResult {
-        version: "v0.2.1-raw".to_string(),
+        version: "v0.2.2".to_string(),
         input_a: a,
         input_b: b,
         operation: op.to_string(),
         result_0: decoded[0],
-        result_1: decoded[1],
+        result_1: if decoded.len() > 1 { decoded[1] } else { 0.0 },
         scheme: "CKKS".to_string(),
-        ct_a_hex: ct.c0.iter().take(8).map(|v| format!("0x{:x}", v)).collect(),
+        ct_a_hex: ct_a.c0.iter().take(8).map(|v| format!("0x{:x}", v)).collect(),
         ct_result_hex: ct_result.c0.iter().take(8).map(|v| format!("0x{:x}", v)).collect(),
     }).unwrap_or(JsValue::NULL)
 }
@@ -110,27 +113,33 @@ pub fn demo_bfv_calc(a: f64, b: f64, op: &str) -> JsValue {
     let bfv_params = params::BfvParams::default();
     let kp = key::generate_keys(&bfv_params, 0xBF_00_01);
 
-    let msgs = vec![a, b];
-    let encoded = encode::encode(&bfv_params, &msgs);
-    let ct = encrypt::encrypt(&bfv_params, &kp.pk, &encoded, 0xBF_00_02);
+    let enc_a = encode::encode(&bfv_params, &[a]);
+    let ct_a = encrypt::encrypt(&bfv_params, &kp.pk, &enc_a, 0xAA);
+    let enc_b = encode::encode(&bfv_params, &[b]);
+    let ct_b = encrypt::encrypt(&bfv_params, &kp.pk, &enc_b, 0xBB);
 
     let ct_result = match op {
-        "add" => eval::add(&bfv_params, &ct, &ct),
-        _ => ct.clone(),
+        "add" => eval::add(&bfv_params, &ct_a, &ct_b),
+        _ => ct_a.clone(),
     };
 
     let dec = encrypt::decrypt(&bfv_params, &ct_result, &kp.sk);
     let decoded = encode::decode(&bfv_params, &dec, 1);
 
+    let dec_a = encrypt::decrypt(&bfv_params, &ct_a, &kp.sk);
+    let plain_a = encode::decode(&bfv_params, &dec_a, 1);
+    let dec_b = encrypt::decrypt(&bfv_params, &ct_b, &kp.sk);
+    let plain_b = encode::decode(&bfv_params, &dec_b, 1);
+
     serde_wasm_bindgen::to_value(&DemoResult {
-        version: "v0.2.1-raw".to_string(),
-        input_a: a as f64,
-        input_b: b as f64,
+        version: "v0.2.2".to_string(),
+        input_a: plain_a[0] as f64,
+        input_b: plain_b[0] as f64,
         operation: op.to_string(),
         result_0: decoded[0] as f64,
         result_1: if decoded.len() > 1 { decoded[1] as f64 } else { 0.0 },
         scheme: "BFV".to_string(),
-        ct_a_hex: ct.c0.iter().take(8).map(|v| format!("0x{:x}", v)).collect(),
+        ct_a_hex: ct_a.c0.iter().take(8).map(|v| format!("0x{:x}", v)).collect(),
         ct_result_hex: ct_result.c0.iter().take(8).map(|v| format!("0x{:x}", v)).collect(),
     }).unwrap_or(JsValue::NULL)
 }
