@@ -1,0 +1,10 @@
+# Cloudflare Pages configuration for BlindRoute
+# Deploy with: npx wrangler pages deploy web/dist --project-name blindroute
+
+name = "blindroute"
+compatibility_date = "2026-08-08"
+pages_build_output_dir = "web/dist"
+
+[vars]
+SITE_TITLE = "BlindRoute"
+SITE_DESCRIPTION = "Zero-Trust FHE API Middleware"

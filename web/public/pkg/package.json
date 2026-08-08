@@ -1,0 +1,20 @@
+{
+  "name": "blindroute-wasm",
+  "description": "Browser WASM bridge for BlindRoute — CKKS + BFV + secret sharing",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jesedv/blindroute"
+  },
+  "files": [
+    "blindroute_wasm_bg.wasm",
+    "blindroute_wasm.js",
+    "blindroute_wasm.d.ts"
+  ],
+  "module": "blindroute_wasm.js",
+  "types": "blindroute_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
