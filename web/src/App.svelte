@@ -17,6 +17,7 @@
   let demoB = $state(73);
   let demoResult = $state(null);
   let demoBusy = $state(false);
+  let mobileMenu = $state(false);
 
   const REPO = 'https://github.com/jesedv/blindroute';
   const DOMAIN = 'https://blindroute.dev';
@@ -93,30 +94,28 @@
     <img src="./favicon.svg" alt="BlindRoute" class="logo-icon" />
     <span class="logo-text">BlindRoute</span>
   </a>
-  <nav class="nav-links">
-    <a href="#why">Why FHE</a>
-    <a href="#advantages">Advantages</a>
-    <a href="#cli">CLI</a>
-    <a href="#how">How It Works</a>
-    <a href="#demo">Live Demo</a>
-    <a href={DOCS}>Docs</a>
-    <a href="#faq">FAQ</a>
+  <button class="hamburger" onclick={() => mobileMenu = !mobileMenu} aria-label="Menu">
+    <span class:open={mobileMenu}></span>
+    <span class:open={mobileMenu}></span>
+    <span class:open={mobileMenu}></span>
+  </button>
+  <nav class="nav-links" class:mobile-open={mobileMenu}>
+    <a href="#demo" onclick={() => mobileMenu = false}>Live Demo</a>
+    <a href="#why" onclick={() => mobileMenu = false}>Why FHE</a>
+    <a href="#cli" onclick={() => mobileMenu = false}>CLI</a>
+    <a href="#publish" onclick={() => mobileMenu = false}>Download</a>
+    <a href="#faq" onclick={() => mobileMenu = false}>FAQ</a>
+    <a href={REPO} target="_blank" rel="noopener" onclick={() => mobileMenu = false}>GitHub</a>
   </nav>
-  <a class="btn btn-ghost" href={REPO} target="_blank" rel="noopener">
-    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-      <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-    </svg>
-    <span>GitHub</span>
-  </a>
 </header>
 
 <main id="top">
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-badge">GPU-Accelerated &middot; Browser-Native</div>
+    <div class="hero-badge">v0.2 &middot; MIT &middot; GPU + WASM</div>
     <h1>Compute on encrypted data.<br /><span class="grad">Without ever decrypting it.</span></h1>
     <p class="hero-sub">
-      <strong>BlindRoute</strong> is the <em>only</em> free, vendor-agnostic engine for fully homomorphic encryption
+      BlindRoute is the free, vendor-agnostic engine for fully homomorphic encryption
       that runs on <strong>any GPU</strong> — and right here in your <strong>browser via WASM</strong>.
       Sum, multiply, and run analytics on ciphertext. The host never sees your plaintext.
     </p>
@@ -126,11 +125,11 @@
       <a class="btn btn-ghost" href={`${REPO}/releases`} target="_blank" rel="noopener">Download Binary</a>
     </div>
     <div class="hero-stats">
-      <span><b>21 tests</b> passing</span>
-      <span><b>601</b> self-test checks</span>
-      <span><b>0 unsafe</b> lines in core</span>
-      <span><b>O(N log N)</b> polynomial ops</span>
+      <span><b>43 tests</b> passing</span>
+      <span><b>CKKS + BFV</b> dual scheme</span>
+      <span><b>0 unsafe</b> core code</span>
       <span><b>Any GPU</b> vendor</span>
+      <span><b>102 KB</b> WASM bundle</span>
     </div>
   </section>
 
@@ -503,23 +502,23 @@
 <footer class="footer">
   <div class="footer-grid">
     <div class="footer-col">
-      <strong>BlindRoute</strong>
-      <p>Field-level, polynomial-ring encryption on GPU. Free, open, auditable.</p>
+      <strong>BlindRoute v0.2</strong>
+      <p>Zero-Trust FHE API Middleware. Free, open, auditable. MIT License.</p>
     </div>
     <div class="footer-col">
       <strong>Links</strong>
       <a href={REPO} target="_blank" rel="noopener">GitHub</a>
-      <a href={DOCS} target="_blank" rel="noopener">Math Docs</a>
-      <a href={`${REPO}/blob/main/docs/publishing.md`} target="_blank" rel="noopener">Publishing Guide</a>
-      <a href={`${REPO}/releases`} target="_blank" rel="noopener">Releases</a>
+      <a href={REPO + '/blob/main/docs/math.md'} target="_blank" rel="noopener">Math Docs</a>
+      <a href={REPO + '/releases'} target="_blank" rel="noopener">Releases</a>
     </div>
     <div class="footer-col">
       <strong>Legal</strong>
       <span>MIT License</span>
-      <span>Verified cryptography — 601 self-test checks</span>
+      <span>43 self-test checks</span>
+      <span>CKKS + BFV dual scheme</span>
     </div>
   </div>
-  <p class="legal">&copy; 2026 BlindRoute. MIT License. <a href="https://jesed.dev/" class="jesed-link">jesed.dev</a></p>
+  <p class="legal">&copy; 2026 BlindRoute. <a href="https://jesed.dev/" class="jesed-link">jesed.dev</a></p>
 </footer>
 
 <style>
@@ -622,4 +621,25 @@
   .error-info { color: var(--ok); font-size: .8rem; }
   .ok-badge { display: inline-block; background: #064e3b; color: var(--ok); padding: 2px 10px; border-radius: 999px; font-size: .8rem; font-weight: 700; margin-left: 8px; }
 
+  .hamburger { display: none; flex-direction: column; gap: 4px; background: none; border: none; cursor: pointer; padding: 8px; }
+  .hamburger span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 2px; transition: .2s; }
+  .hamburger span.open:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+  .hamburger span.open:nth-child(2) { opacity: 0; }
+  .hamburger span.open:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+  @media (max-width: 768px) {
+    .hamburger { display: flex; }
+    .nav-links { display: none; position: absolute; top: 60px; left: 0; right: 0; background: var(--bg); border-bottom: 1px solid var(--line); flex-direction: column; padding: 12px 28px; gap: 12px; z-index: 30; }
+    .nav-links.mobile-open { display: flex; }
+    .hero { padding: 48px 16px 32px; }
+    .hero h1 { font-size: 1.8rem; }
+    .hero-stats { gap: 8px; }
+    .hero-stats span { font-size: .75rem; }
+    .section { padding: 40px 16px; }
+    .grid3 { grid-template-columns: 1fr; }
+    .demo-pipeline { flex-wrap: wrap; justify-content: center; }
+    .pipe-arrow { padding-top: 0; transform: rotate(90deg); }
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .footer-grid { grid-template-columns: 1fr; text-align: center; }
+  }
 </style>
