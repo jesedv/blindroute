@@ -62,90 +62,88 @@ pub fn engine_info() -> JsValue {
     }).unwrap_or(JsValue::NULL)
 }
 
-use blindroute_core::scheme::FheScheme;
-
 #[wasm_bindgen]
 pub fn demo_ckks_calc(a: f64, b: f64, op: &str) -> JsValue {
-    let scheme = blindroute_ckks::CkksScheme::new();
-    let kp = blindroute_ckks::key::generate_keys(0xCAFE);
-    let scale = blindroute_ckks::params::DELTA as f64;
+    use blindroute_ckks::{key, encode, encrypt, eval, params};
+    let kp = key::generate_keys(0xCAFE);
+    let scale = params::DELTA as f64;
 
-    // Encode: pad to N/2=64 slots via scheme's own padding logic
-    let n2 = blindroute_ckks::params::N / 2;
+    let n2 = params::N / 2;
     let mut message = vec![0.0f64; n2];
     message[0] = a;
     message[1] = b;
-    let enc = blindroute_ckks::encode::encode_real(&message, scale);
+    let enc = encode::encode_real(&message, scale);
 
-    let ct = blindroute_ckks::encrypt::encrypt(&kp.pk, &enc, scale, 0x42);
+    let ct = encrypt::encrypt(&kp.pk, &enc, scale, 0x42);
 
     let ct_result = match op {
-        "add" => blindroute_ckks::eval::add(&ct, &ct),
+        "add" => eval::add(&ct, &ct),
         "mul" => {
-            let mul = blindroute_ckks::eval::multiply(&ct, &ct);
-            blindroute_ckks::eval::relinearize(&mul, &kp.ek)
+            let mul = eval::multiply(&ct, &ct);
+            eval::relinearize(&mul, &kp.ek)
         }
         _ => ct.clone(),
     };
     let decode_scale = if op == "mul" { scale * scale } else { scale };
 
-    let dec = blindroute_ckks::eval::decrypt(&ct_result, &kp.sk);
-    let decoded = blindroute_ckks::encode::decode_real(&dec, decode_scale);
+    let dec = eval::decrypt(&ct_result, &kp.sk);
+    let decoded = encode::decode_real(&dec, decode_scale);
 
     serde_wasm_bindgen::to_value(&DemoResult {
+        version: "v0.2.1-raw".to_string(),
         input_a: a,
         input_b: b,
         operation: op.to_string(),
         result_0: decoded[0],
         result_1: decoded[1],
         scheme: "CKKS".to_string(),
-        ct_a_c0: ct.c0.iter().take(8).copied().collect(),
-        ct_result_c0: ct_result.c0.iter().take(8).copied().collect(),
+        ct_a_hex: ct.c0.iter().take(8).map(|v| format!("0x{:x}", v)).collect(),
+        ct_result_hex: ct_result.c0.iter().take(8).map(|v| format!("0x{:x}", v)).collect(),
     }).unwrap_or(JsValue::NULL)
 }
 
 #[wasm_bindgen]
-pub fn demo_bfv_calc(a: i64, b: i64, op: &str) -> JsValue {
-    let params = blindroute_bfv::params::BfvParams {
-        n: 128,
-        q: 0xFFFFFFFF00000001,
-        t: 65537,
-        sigma: 3.2,
-        delta: 0xFFFFFFFF00000001 / 65537,
-    };
-    let (sk, pk, ek) = <blindroute_bfv::BfvScheme as FheScheme>::generate_keys(&params);
+pub fn demo_bfv_calc(a: f64, b: f64, op: &str) -> JsValue {
+    let a = a.round() as i64;
+    let b = b.round() as i64;
+    use blindroute_bfv::{key, encode, encrypt, eval, params};
+    let bfv_params = params::BfvParams::default();
+    let kp = key::generate_keys(&bfv_params, 0xBF_00_01);
 
-    let enc = <blindroute_bfv::BfvScheme as FheScheme>::encode(&params, &[a as f64, b as f64]);
-    let ct = <blindroute_bfv::BfvScheme as FheScheme>::encrypt(&pk, &enc);
+    let msgs = vec![a, b];
+    let encoded = encode::encode(&bfv_params, &msgs);
+    let ct = encrypt::encrypt(&bfv_params, &kp.pk, &encoded, 0xBF_00_02);
 
     let ct_result = match op {
-        "add" => <blindroute_bfv::BfvScheme as FheScheme>::add(&ek, &ct, &ct),
+        "add" => eval::add(&bfv_params, &ct, &ct),
         _ => ct.clone(),
     };
 
-    let dec = <blindroute_bfv::BfvScheme as FheScheme>::decrypt(&sk, &ct_result);
-    let decoded = <blindroute_bfv::BfvScheme as FheScheme>::decode(&params, &dec, 1);
+    let dec = encrypt::decrypt(&bfv_params, &ct_result, &kp.sk);
+    let decoded = encode::decode(&bfv_params, &dec, 1);
 
     serde_wasm_bindgen::to_value(&DemoResult {
+        version: "v0.2.1-raw".to_string(),
         input_a: a as f64,
         input_b: b as f64,
         operation: op.to_string(),
-        result_0: decoded[0],
-        result_1: decoded[1],
+        result_0: decoded[0] as f64,
+        result_1: if decoded.len() > 1 { decoded[1] as f64 } else { 0.0 },
         scheme: "BFV".to_string(),
-        ct_a_c0: ct.c0.iter().take(8).copied().collect(),
-        ct_result_c0: ct_result.c0.iter().take(8).copied().collect(),
+        ct_a_hex: ct.c0.iter().take(8).map(|v| format!("0x{:x}", v)).collect(),
+        ct_result_hex: ct_result.c0.iter().take(8).map(|v| format!("0x{:x}", v)).collect(),
     }).unwrap_or(JsValue::NULL)
 }
 
 #[derive(Serialize)]
 struct DemoResult {
+    version: String,
     input_a: f64,
     input_b: f64,
     operation: String,
     result_0: f64,
     result_1: f64,
     scheme: String,
-    ct_a_c0: Vec<u64>,
-    ct_result_c0: Vec<u64>,
+    ct_a_hex: Vec<String>,
+    ct_result_hex: Vec<String>,
 }

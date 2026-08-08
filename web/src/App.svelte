@@ -75,9 +75,9 @@
       const a = realIncome * 0.6 + realCredit * 0.02;
       const b = 1.0 / Math.max(realLoan, 1);
       demoResult = engine.demo_ckks_calc(a, b, 'mul');
-      demoResult._hexA = demoResult.ct_a_c0.slice(0, 5).map(v => '0x' + v.toString(16));
-      demoResult._hexR = demoResult.ct_result_c0.slice(0, 5).map(v => '0x' + v.toString(16));
-      demoResult._bodySize = demoResult.ct_a_c0.length * 8;
+      demoResult._hexA = demoResult.ct_a_hex.slice(0, 5);
+      demoResult._hexR = demoResult.ct_result_hex.slice(0, 5);
+      demoResult._bodySize = demoResult.ct_a_hex.length * 8;
     } catch (e) {
       demoResult = { error: String(e) };
     } finally {
@@ -90,9 +90,9 @@
     bfvDemoBusy = true; bfvDemoResult = null;
     await new Promise((r) => setTimeout(r, 30));
     try {
-      bfvDemoResult = engine.demo_bfv_calc(Math.round(bfvDemoA), Math.round(bfvDemoB), 'add');
-      bfvDemoResult._hexA = bfvDemoResult.ct_a_c0.slice(0, 5).map(v => '0x' + v.toString(16));
-      bfvDemoResult._hexR = bfvDemoResult.ct_result_c0.slice(0, 5).map(v => '0x' + v.toString(16));
+      bfvDemoResult = engine.demo_bfv_calc(bfvDemoA, bfvDemoB, 'add');
+      bfvDemoResult._hexA = bfvDemoResult.ct_a_hex.slice(0, 5);
+      bfvDemoResult._hexR = bfvDemoResult.ct_result_hex.slice(0, 5);
       bfvDemoResult._reqJson = JSON.stringify({
         scheme: 'BFV',
         ciphertext: { c0: bfvDemoResult._hexA.concat(['...']), c1: ['0x...'], level: 0 }
@@ -102,7 +102,7 @@
         result: { c0: bfvDemoResult._hexR.concat(['...']), c1: ['0x...'], level: 0 },
         noise_budget: { remaining: 7, bits: 55 }
       }, null, 2);
-      bfvDemoResult._bodySize = bfvDemoResult.ct_a_c0.length * 8;
+      bfvDemoResult._bodySize = bfvDemoResult.ct_a_hex.length * 8;
     } catch (e) {
       bfvDemoResult = { error: String(e) };
     } finally {

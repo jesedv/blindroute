@@ -3,7 +3,7 @@
 
 export function ckks_engine_info(): any;
 
-export function demo_bfv_calc(a: bigint, b: bigint, op: string): any;
+export function demo_bfv_calc(a: number, b: number, op: string): any;
 
 export function demo_ckks_calc(a: number, b: number, op: string): any;
 
@@ -22,7 +22,7 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly ckks_engine_info: () => any;
-    readonly demo_bfv_calc: (a: bigint, b: bigint, c: number, d: number) => any;
+    readonly demo_bfv_calc: (a: number, b: number, c: number, d: number) => any;
     readonly demo_ckks_calc: (a: number, b: number, c: number, d: number) => any;
     readonly engine_info: () => any;
     readonly private_mean: (a: number, b: number, c: bigint) => any;

@@ -2,7 +2,7 @@
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
 export const ckks_engine_info: () => any;
-export const demo_bfv_calc: (a: bigint, b: bigint, c: number, d: number) => any;
+export const demo_bfv_calc: (a: number, b: number, c: number, d: number) => any;
 export const demo_ckks_calc: (a: number, b: number, c: number, d: number) => any;
 export const engine_info: () => any;
 export const private_mean: (a: number, b: number, c: bigint) => any;

@@ -9,8 +9,8 @@ export function ckks_engine_info() {
 }
 
 /**
- * @param {bigint} a
- * @param {bigint} b
+ * @param {number} a
+ * @param {number} b
  * @param {string} op
  * @returns {any}
  */
