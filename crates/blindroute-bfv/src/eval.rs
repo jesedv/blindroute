@@ -30,11 +30,15 @@ pub fn sub(params: &BfvParams, ct0: &Ciphertext, ct1: &Ciphertext) -> Ciphertext
 
 /// BFV homomorphic multiplication (tensor product).
 ///
-/// **Known limitation (v0.2):** The tensor product encrypts `m1*m2*delta²`.
-/// Since `delta² >> q` for the Goldilocks prime, the value wraps modulo q
-/// and decode produces incorrect results. Correct multiplication requires
-/// a CRT modulus chain with per-level primes where each transition
-/// compresses by factor ~t. Planned for v0.3.
+/// **Known limitation (v0.2):** The product encrypts `m1*m2*delta²`. Since
+/// `delta² >> q` for any practical Q < t², the value wraps modulo q and
+/// decode fails for m > 1. Analysis shows:
+/// - Single-modulus: needs Q ≈ t² ≈ 4e9, but m·delta² wraps for m > 1
+/// - 2-level CRT: Q_L < 2^64 imposes p₁ ≈ 2^32, still insufficient levels
+/// - 3-level CRT: requires u128 products for intermediate moduli
+/// - Full solution: u128 NTT + 3+ level CRT chain (v0.3+)
+///
+/// BFV homomorphic addition is fully functional and verified.
 pub fn multiply(params: &BfvParams, ct0: &Ciphertext, ct1: &Ciphertext) -> Ciphertext {
     let n = params.n;
     let q = params.q;
