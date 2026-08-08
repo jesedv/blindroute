@@ -1,0 +1,32 @@
+# BlindRoute
+> Zero-Trust FHE API Middleware — compute on encrypted data without ever decrypting it.
+
+## About
+BlindRoute wraps any arithmetic API in Fully Homomorphic Encryption (FHE) so the server computes on encrypted data without ever seeing plaintext. Dual-scheme: CKKS (real numbers, ML, statistics) + BFV (integers, finance). GPU-accelerated NTT via wgpu. Browser-native WASM demo. MIT licensed.
+
+## Pages
+- Home: https://blindroute.jesed.dev/ — Landing page with live interactive WASM FHE demo
+- Math Docs: https://blindroute.jesed.dev/docs/ — Mathematical exposition of CKKS, BFV, NTT, RLWE
+
+## Key Concepts
+- Fully Homomorphic Encryption (FHE): Computation on ciphertexts without decryption
+- CKKS: Approximate arithmetic on real/complex numbers via canonical embedding
+- BFV: Exact integer arithmetic via polynomial encoding
+- NTT: Number-Theoretic Transform — O(N log N) polynomial multiplication over finite fields
+- RLWE: Ring Learning With Errors — quantum-resistant cryptographic foundation
+- Circuit IR: Declarative arithmetic circuit definition with `circuit!` macro
+- Gadget Relinearization: Noise-optimized 3→2 component ciphertext reduction
+
+## Quick Start
+```
+curl -fsSL https://raw.githubusercontent.com/jesedv/blindroute/master/install.sh | sh
+blindroute keygen --out keys/
+blindroute encrypt --pub keys/pub.json --in data.json --out ct.json
+blindroute compute add ct.json ct.json --out sum.json
+blindroute decrypt --sec keys/sec.json --in sum.json
+```
+
+## Repository
+- GitHub: https://github.com/jesedv/blindroute
+- Releases: https://github.com/jesedv/blindroute/releases
+- License: MIT

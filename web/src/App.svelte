@@ -85,8 +85,8 @@
 </script>
 
 <svelte:head>
-  <title>BlindRoute — Free Open-Source FHE Engine on GPU</title>
-  <meta name="description" content="BlindRoute is a free, open-source fully homomorphic encryption engine. Compute on encrypted data without ever decrypting. Runs on any GPU and in the browser via WASM. Live demo." />
+  <title>BlindRoute — Zero-Trust FHE API Middleware</title>
+  <meta name="description" content="Free, open-source fully homomorphic encryption. Dual-scheme CKKS + BFV. Compute on encrypted data without ever decrypting. GPU-accelerated, browser-native WASM demo." />
 </svelte:head>
 
 <header class="nav">
@@ -630,17 +630,27 @@
 
   @media (max-width: 768px) {
     .hamburger { display: flex; }
-    .nav-links { display: none; position: absolute; top: 60px; left: 0; right: 0; background: var(--bg); border-bottom: 1px solid var(--line); flex-direction: column; padding: 12px 28px; gap: 12px; z-index: 30; }
+    .nav-links { display: none; position: absolute; top: 60px; left: 0; right: 0; background: rgba(11,14,22,.96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); flex-direction: column; padding: 12px 28px; gap: 12px; z-index: 30; }
     .nav-links.mobile-open { display: flex; }
     .hero { padding: 48px 16px 32px; }
-    .hero h1 { font-size: 1.8rem; }
-    .hero-stats { gap: 8px; }
-    .hero-stats span { font-size: .75rem; }
+    .hero h1 { font-size: 1.8rem; line-height: 1.3; }
+    .hero-sub { font-size: .95rem; }
+    .hero-stats { gap: 6px; flex-wrap: wrap; justify-content: center; }
+    .hero-stats span { font-size: .72rem; padding: 4px 8px; }
+    .hero-actions { flex-direction: column; align-items: stretch; gap: 10px; }
+    .hero-actions .btn { justify-content: center; }
     .section { padding: 40px 16px; }
+    .section h2 { font-size: 1.4rem; }
     .grid3 { grid-template-columns: 1fr; }
+    .grid2 { grid-template-columns: 1fr; }
     .demo-pipeline { flex-wrap: wrap; justify-content: center; }
     .pipe-arrow { padding-top: 0; transform: rotate(90deg); }
-    .demo-controls { flex-direction: column; align-items: stretch; }
-    .footer-grid { grid-template-columns: 1fr; text-align: center; }
+    .demo-controls { flex-direction: column; align-items: stretch; gap: 10px; }
+    .demo-label { flex-wrap: wrap; }
+    .footer-grid { grid-template-columns: 1fr; text-align: center; gap: 20px; }
+    .footer-col { align-items: center; }
+    .card { padding: 16px; }
+    .faq dt { font-size: .95rem; }
+    code.mini { font-size: .75rem; word-break: break-all; }
   }
 </style>

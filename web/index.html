@@ -6,57 +6,63 @@
     <meta name="theme-color" content="#0b0e16" />
 
     <!-- Primary SEO -->
-    <title>BlindRoute v0.2 — Zero-Trust FHE API Middleware</title>
+    <title>BlindRoute — Zero-Trust FHE API Middleware | Compute on Encrypted Data</title>
     <meta
       name="description"
-      content="BlindRoute v0.2: Zero-Trust FHE API Middleware. CKKS + BFV dual-scheme fully homomorphic encryption. GPU-accelerated, browser-native WASM. Compute on encrypted data without ever decrypting."
+      content="BlindRoute: Zero-Trust FHE API Middleware. Dual-scheme (CKKS + BFV) fully homomorphic encryption. GPU-accelerated, browser-native WASM. Compute on encrypted data without ever decrypting. MIT licensed, free forever."
     />
     <meta
       name="keywords"
-      content="FHE, fully homomorphic encryption, GPU, NTT, number theoretic transform, RLWE, CKKS, BFV, privacy, encrypted analytics, private mean, secret sharing, WASM, WebGPU, homomorphic encryption"
+      content="FHE, fully homomorphic encryption, GPU, NTT, number theoretic transform, RLWE, CKKS, BFV, privacy, encrypted analytics, zero-trust, API middleware, secret sharing, WASM, WebGPU, homomorphic encryption, post-quantum cryptography"
     />
-    <meta name="author" content="blindroute contributors" />
-    <meta name="robots" content="index, follow" />
+    <meta name="author" content="jesed" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     <link rel="canonical" href="https://blindroute.jesed.dev/" />
 
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://blindroute.jesed.dev/" />
-    <meta property="og:title" content="BlindRoute — Fully Homomorphic Encryption on GPU" />
+    <meta property="og:title" content="BlindRoute — Zero-Trust FHE API Middleware" />
     <meta
       property="og:description"
-      content="Compute on encrypted data without decrypting. Free, open-source, browser-native NTT + secret-sharing FHE engine for every GPU vendor + WASM."
+      content="Free, open-source fully homomorphic encryption. Compute on encrypted data without decrypting. CKKS + BFV, GPU-accelerated, browser-native. Live WASM demo."
     />
     <meta property="og:site_name" content="BlindRoute" />
     <meta property="og:image" content="https://blindroute.jesed.dev/og-cover.svg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="en_US" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="BlindRoute — Fully Homomorphic Encryption on GPU" />
+    <meta name="twitter:site" content="@jesedv" />
+    <meta name="twitter:title" content="BlindRoute — Zero-Trust FHE API Middleware" />
     <meta
       name="twitter:description"
-      content="Compute on encrypted data without decrypting. Free, open-source, browser-native FHE engine across GPU vendors + WASM. Live demo."
+      content="Free FHE middleware. Compute on encrypted data. CKKS + BFV, GPU-accelerated, browser WASM. Live demo."
     />
     <meta name="twitter:image" content="https://blindroute.jesed.dev/og-cover.svg" />
 
     <!-- GitHub -->
     <meta property="github:repo" content="jesedv/blindroute" />
 
-    <!-- Structured data -->
+    <!-- Structured data (SoftwareApplication) -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "SoftwareSourceCode",
+        "@type": "SoftwareApplication",
         "name": "BlindRoute",
-        "alternateName": "blindroute",
-        "description": "Cross-vendor fully homomorphic encryption on GPU: an NTT + NTT/INTT core (RLWE / CKKS / BFV-style ring Z_q[x]/(x^N+1)), 32-bit emulated 64-bit modular arithmetic, and threshold secret-sharing, with a browser-native WASM demo.",
+        "alternateName": "BlindRoute FHE Middleware",
+        "description": "Zero-Trust FHE API Middleware. CKKS + BFV dual-scheme fully homomorphic encryption. GPU-accelerated NTT. Browser-native WASM.",
+        "applicationCategory": "SecurityApplication",
+        "operatingSystem": "Linux, macOS, WebAssembly",
         "codeRepository": "https://github.com/jesedv/blindroute",
         "license": "https://opensource.org/licenses/MIT",
-        "programmingLanguage": "Rust",
-        "operatingSystem": "Cross-platform, WebAssembly, GPU (Vulkan/Metal/DX12/WebGPU)",
-        "applicationCategory": "SecurityApplication",
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "author": { "@type": "Person", "name": "jesed", "url": "https://jesed.dev" },
+        "downloadUrl": "https://github.com/jesedv/blindroute/releases/latest",
+        "softwareVersion": "0.2.0",
+        "datePublished": "2026-08-08",
         "isAccessibleForFree": true
       }
     </script>
@@ -66,18 +72,18 @@
   </head>
   <body>
     <noscript>
-      <h1>BlindRoute — Fully Homomorphic Encryption on GPU</h1>
+      <h1>BlindRoute — Zero-Trust FHE API Middleware</h1>
       <p>
-        BlindRoute computes on encrypted data without ever decrypting it: a free, open-source,
-        browser-native engine (RLWE / CKKS / BFV-style ring Z_q[x]/(x^N+1)) built on an NTT /
-        INTT core with a threshold secret-sharing "private mean" demo. Runs on any GPU vendor
-        and in the browser via WASM.
+        BlindRoute wraps any arithmetic API in Fully Homomorphic Encryption so the
+        server computes on encrypted data without ever decrypting it. Dual-scheme
+        CKKS + BFV. GPU-accelerated. Browser-native WASM. MIT licensed.
       </p>
       <ul>
-        <li>NTT / INTT over Z_q with 32-bit-emulated 64-bit modular arithmetic.</li>
-        <li>RLWE negacyclic polynomial multiply mod x^N+1.</li>
-        <li>Threshold secret sharing: compute a mean from N parties revealing nothing.</li>
-        <li>WASM build verified live, in your browser.</li>
+        <li>CKKS: Real-number homomorphic encryption — encode, encrypt, add, multiply, rescale</li>
+        <li>BFV: Integer homomorphic encryption — encode, encrypt, add</li>
+        <li>GPU NTT via wgpu (Vulkan, Metal, DX12, WebGPU)</li>
+        <li>WASM demo: live in-browser FHE calculator</li>
+        <li>circuit! DSL: declarative arithmetic circuit definition</li>
       </ul>
       <p>
         Source: <a href="https://github.com/jesedv/blindroute">github.com/jesedv/blindroute</a>

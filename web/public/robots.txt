@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /dist/
 
 Sitemap: https://blindroute.jesed.dev/sitemap.xml
+

@@ -1,4 +1,22 @@
-/wasm
+# Cloudflare Pages headers — caching + security
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# WASM — must serve with correct MIME
+/pkg/*.wasm
   Content-Type: application/wasm
-  Cross-Origin-Opener-Policy: same-origin
-  Cross-Origin-Embedder-Policy: require-corp
+  Cache-Control: public, max-age=31536000, immutable
+
+# Static assets — long cache
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML — no cache (SPA)
+/index.html
+  Cache-Control: no-cache
+
+# Docs
+/docs/*
+  Cache-Control: public, max-age=86400
