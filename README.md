@@ -164,14 +164,21 @@ const score = client.decrypt(result); // → number
 
 ## Installation
 
+### One-line install (Linux/macOS)
+
 ```bash
-# CLI
+curl -fsSL https://raw.githubusercontent.com/jesedv/blindroute/master/install.sh | sh
+```
+
+### From source
+
+```bash
 cargo install --path .
+```
 
-# Server
-cargo add blindroute-server blindroute-ckks
+### NPM (browser WASM)
 
-# Web
+```bash
 cd web && npm install && npm run dev
 ```
 

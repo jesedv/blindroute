@@ -122,7 +122,7 @@
     <div class="hero-actions">
       <a class="btn btn-primary" href="#demo">Run Live Demo</a>
       <a class="btn btn-ghost" href={REPO} target="_blank" rel="noopener">Source Code</a>
-      <a class="btn btn-ghost" href={`${REPO}/releases`} target="_blank" rel="noopener">Download Binary</a>
+      <a class="btn btn-ghost" href={`${REPO}/releases/latest`} target="_blank" rel="noopener">Download v0.2.0</a>
     </div>
     <div class="hero-stats">
       <span><b>43 tests</b> passing</span>
@@ -387,8 +387,9 @@
       </div>
       <div class="card">
         <h3>CLI Binary</h3>
-        <p>Usable CLI — no Rust knowledge needed. <code>keygen</code>, <code>encrypt</code>, <code>compute</code>, <code>decrypt</code>. Prebuilt for Linux, macOS, Windows.</p>
-        <a class="btn btn-ghost" href={`${REPO}/releases`} target="_blank" rel="noopener">Download</a>
+        <p>No Rust needed. <code>keygen</code>, <code>encrypt</code>, <code>compute</code>, <code>decrypt</code>. Prebuilt for Linux, macOS.</p>
+        <code class="mini">curl -fsSL https://raw.githubusercontent.com/jesedv/blindroute/master/install.sh | sh</code>
+        <a class="btn btn-ghost" href={`${REPO}/releases`} target="_blank" rel="noopener">v0.2.0 Release</a>
       </div>
       <div class="card">
         <h3>WASM / npm</h3>
@@ -480,7 +481,7 @@
     <h2>Frequently Asked Questions</h2>
     <dl class="faq">
       <dt>How do I start using BlindRoute?</dt>
-      <dd>Download the binary and run: <code>blindroute keygen --out keys/</code> then <code>blindroute encrypt --pub keys/pub.json --in data.json --out ct.json</code>. No Rust toolchain needed.</dd>
+      <dd>One command: <code>curl -fsSL https://raw.githubusercontent.com/jesedv/blindroute/master/install.sh | sh</code>. Then <code>blindroute keygen --out keys/</code>, <code>blindroute encrypt</code>, <code>blindroute compute</code>, <code>blindroute decrypt</code>. No Rust toolchain needed.</dd>
       <dt>Is this actually full FHE?</dt>
       <dd>Yes. The CKKS scheme performs encode, encrypt, decrypt, homomorphic addition, and homomorphic multiplication on genuine RLWE ciphertexts. GPU NTT shaders are live; modulus switching is on the roadmap.</dd>
       <dt>Do I need a GPU?</dt>
