@@ -4,15 +4,15 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
 
-# Install script — text/plain for curl | sh compatibility
+# Install script — text/plain for curl compatibility
 /install.sh
   Content-Type: text/plain
   Cache-Control: public, max-age=3600
 
-# WASM — must serve with correct MIME
+# WASM — correct MIME, short cache
 /pkg/*.wasm
   Content-Type: application/wasm
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=300
 
 # Static assets — long cache
 /assets/*
