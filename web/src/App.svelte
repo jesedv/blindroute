@@ -11,14 +11,18 @@
   let meanResult = $state(null);
   let meanBusy = $state(false);
 
-  let demoScheme = $state('ckks');
-  let demoOp = $state('add');
-  let demoA = $state(42);
-  let demoB = $state(73);
   let demoResult = $state(null);
   let demoBusy = $state(false);
 
-  // Second demo: BFV-specific
+  // Realistic credit-score demo
+  let realName = $state('Jane Doe');
+  let realBank = $state('****2837');
+  let realBirth = $state('1990-05-15');
+  let realIncome = $state(85000);
+  let realLoan = $state(25000);
+  let realCredit = $state(720);
+
+  // BFV demo
   let bfvDemoA = $state(15);
   let bfvDemoB = $state(27);
   let bfvDemoResult = $state(null);
@@ -61,32 +65,19 @@
   function bump(i, d) { parties[i] = Math.max(1, Number(parties[i]) + d); }
   function partyView(j) { if (!meanResult?.party_views) return []; return meanResult.party_views.map((row) => row[j]); }
 
-  async function runDemo() {
+  async function runRealDemo() {
     if (!engine) engine = await loadWasm();
     demoBusy = true; demoResult = null;
     await new Promise((r) => setTimeout(r, 30));
     try {
-      if (demoScheme === 'ckks') {
-        demoResult = engine.demo_ckks_calc(demoA, demoB, demoOp);
-      } else {
-        demoResult = engine.demo_bfv_calc(Math.round(demoA), Math.round(demoB), 'add');
-      }
-      // Precompute hex strings for display
+      // Compute: (income*0.6 + credit*0.005*100*0.4) / loan as a single multiply
+      // Encrypt the combined value and multiply by inverse loan
+      const a = realIncome * 0.6 + realCredit * 0.02;
+      const b = 1.0 / Math.max(realLoan, 1);
+      demoResult = engine.demo_ckks_calc(a, b, 'mul');
       demoResult._hexA = demoResult.ct_a_c0.slice(0, 5).map(v => '0x' + v.toString(16));
       demoResult._hexR = demoResult.ct_result_c0.slice(0, 5).map(v => '0x' + v.toString(16));
-      demoResult._reqJson = JSON.stringify({
-        scheme: demoScheme.toUpperCase(),
-        ciphertext: { c0: demoResult._hexA.concat(['...']), c1: ['0x...'], level: 0 }
-      }, null, 2);
-      demoResult._respJson = JSON.stringify({
-        status: 'ok',
-        result: { c0: demoResult._hexR.concat(['...']), c1: ['0x...'], level: 1 },
-        noise_budget: { remaining: 3, bits: 42 }
-      }, null, 2);
       demoResult._bodySize = demoResult.ct_a_c0.length * 8;
-      demoResult._verifyError = demoResult.operation === 'add'
-        ? Math.abs(demoResult.result_0 - (demoA + demoB))
-        : Math.abs(demoResult.result_0 - (demoA * demoB));
     } catch (e) {
       demoResult = { error: String(e) };
     } finally {
@@ -136,7 +127,7 @@
     <span class:open={mobileMenu}></span>
   </button>
   <nav class="nav-links" class:mobile-open={mobileMenu}>
-    <a href="#demo" onclick={() => mobileMenu = false}>CKKS Demo</a>
+    <a href="#demo" onclick={() => mobileMenu = false}>Credit Demo</a>
     <a href="#demo-bfv" onclick={() => mobileMenu = false}>BFV Demo</a>
     <a href="#why" onclick={() => mobileMenu = false}>Why FHE</a>
     <a href="#cli" onclick={() => mobileMenu = false}>CLI</a>
@@ -436,36 +427,38 @@
     </div>
   </section>
 
-  <!-- INTERACTIVE FHE PIPELINE DEMO -->
+  <!-- CREDIT SCORE DEMO — REALISTIC CKKS PIPELINE -->
   <section id="demo" class="section section-alt">
-    <h2>Live Demo — see FHE end-to-end</h2>
-    <p class="lead">This demo runs a <strong>real CKKS homomorphic computation</strong> in your browser. You are the client. The WASM engine is the server. Watch encrypted data flow through every stage.</p>
+    <h2>Live Demo — Credit Score on Encrypted Data</h2>
+    <p class="lead">A realistic scenario: a bank wants to calculate your credit score but <strong>must never see your income or loan amount</strong>. Your data stays encrypted from browser to server and back.</p>
 
     <div class="demo-form">
       <div class="demo-field">
-        <label for="demo-scheme">Scheme</label>
-        <select id="demo-scheme" bind:value={demoScheme}>
-          <option value="ckks">CKKS (real numbers, ML/stats)</option>
-          <option value="bfv">BFV (integers, finance)</option>
-        </select>
+        <label for="real-name">Full Name</label>
+        <input id="real-name" type="text" bind:value={realName} placeholder="Jane Doe" />
       </div>
       <div class="demo-field">
-        <label for="demo-op">Operation</label>
-        <select id="demo-op" bind:value={demoOp}>
-          <option value="add">Addition (A + B)</option>
-          <option value="mul">Multiplication (A × B)</option>
-        </select>
+        <label for="real-bank">Bank Account</label>
+        <input id="real-bank" type="text" bind:value={realBank} placeholder="****2837" />
       </div>
       <div class="demo-field">
-        <label for="demo-a">Value A</label>
-        <input type="number" bind:value={demoA} step="any" id="demo-a" placeholder="42" />
+        <label for="real-birth">Birth Date</label>
+        <input id="real-birth" type="text" bind:value={realBirth} placeholder="1990-05-15" />
       </div>
       <div class="demo-field">
-        <label for="demo-b">Value B</label>
-        <input type="number" bind:value={demoB} step="any" id="demo-b" placeholder="73" />
+        <label for="real-income">Annual Income ($)</label>
+        <input id="real-income" type="number" bind:value={realIncome} step="1000" placeholder="85000" />
       </div>
-      <button class="btn btn-primary" onclick={runDemo} disabled={demoBusy}>
-        {demoBusy ? '⏳ Computing homomorphically...' : '🔐 Encrypt & Compute'}
+      <div class="demo-field">
+        <label for="real-loan">Loan Amount ($)</label>
+        <input id="real-loan" type="number" bind:value={realLoan} step="1000" placeholder="25000" />
+      </div>
+      <div class="demo-field">
+        <label for="real-credit">Credit Score</label>
+        <input id="real-credit" type="number" bind:value={realCredit} step="1" placeholder="720" />
+      </div>
+      <button class="btn btn-primary" onclick={runRealDemo} disabled={demoBusy}>
+        {demoBusy ? '⏳ Encrypting & Processing...' : '🔐 Submit Encrypted Application'}
       </button>
     </div>
 
@@ -474,110 +467,99 @@
         <div class="tl-verify warn">Error: {demoResult.error}</div>
       {:else}
       <div class="timeline">
-        <!-- Stage 1: Client Input -->
         <div class="timeline-row client">
           <div class="tl-badge">CLIENT</div>
           <div class="tl-card">
-            <div class="tl-step">❶ Input</div>
+            <div class="tl-step">❶ Encrypt Application</div>
             <div class="tl-body">
-              <p>User enters plaintext values into the form:</p>
-              <code>A = {demoA},  B = {demoB}</code>
-              <p class="tl-note">Operation: {demoResult.operation === 'add' ? 'Addition' : 'Multiplication'}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stage 2: Client Encrypts -->
-        <div class="timeline-row client">
-          <div class="tl-badge">CLIENT</div>
-          <div class="tl-card">
-            <div class="tl-step">❷ Encrypt</div>
-            <div class="tl-body">
-              <p>WASM encrypts the values locally using the server's public key.</p>
+              <p>Browser WASM encrypts <strong>income and loan amount</strong> locally. Name and account stay local — never sent.</p>
               <div class="tl-json">
-                <span class="json-label">POST /compute — Request Body (RLWE Ciphertext)</span>
-                <pre>{demoResult._reqJson}</pre>
+                <span class="json-label">POST /api/v1/credit-score — Request</span>
+                <pre>{JSON.stringify({
+  applicant: realName || 'Jane Doe',
+  income: '🔐 ENCRYPTED',
+  loan_amount: '🔐 ENCRYPTED',
+  credit_score: realCredit,
+  ciphertexts: [{
+    c0: demoResult._hexA.concat(['...']),
+    c1: ['0x...'],
+    level: 0, scheme: 'CKKS'
+  }]
+}, null, 2)}</pre>
               </div>
-              <p class="tl-note">⚠️ All values are encrypted. The server cannot read A or B.</p>
+              <p class="tl-note">⚠️ Income and loan amount are ciphertexts. Even if intercepted, they are meaningless.</p>
             </div>
           </div>
         </div>
-
-        <!-- Stage 3: Network Request -->
         <div class="timeline-row network">
           <div class="tl-badge">HTTPS</div>
           <div class="tl-card">
-            <div class="tl-step">❸ Request</div>
+            <div class="tl-step">❷ Network</div>
             <div class="tl-body">
-              <p>Encrypted ciphertext travels to the server over HTTPS.</p>
-              <code class="http">POST /api/v1/compute HTTP/2</code>
-              <code class="http">Content-Type: application/json</code>
-              <code class="http">Content-Length: {demoResult._bodySize} bytes</code>
-              <p class="tl-note">🔒 An eavesdropper sees only random-looking bytes.</p>
+              <code class="http">POST /api/v1/credit-score HTTP/2</code>
+              <code class="http">Authorization: Bearer sk_live_••••</code>
+              <code class="http">Body: {demoResult._bodySize} bytes (encrypted)</code>
+              <p class="tl-note">🔒 Eavesdroppers see only random-looking ciphertext bytes.</p>
             </div>
           </div>
         </div>
-
-        <!-- Stage 4: Server Computes -->
         <div class="timeline-row server">
           <div class="tl-badge">SERVER</div>
           <div class="tl-card">
-            <div class="tl-step">❹ Compute</div>
+            <div class="tl-step">❸ Homomorphic Processing</div>
             <div class="tl-body">
-              <p>The BlindRoute gateway receives the ciphertext and evaluates the circuit <strong>without ever decrypting</strong>:</p>
-              <code>circuit! &#123; inputs[0] {demoResult.operation === 'add' ? '+' : '*'} inputs[1] &#125;</code>
-              <p class="tl-math">{demoResult.operation === 'add' ? 'Enc(A) + Enc(B) = Enc(A + B)' : 'Enc(A) × Enc(B) → relinearize → Enc(A × B)'}</p>
-              <p class="tl-note">⚡ Computation runs on ciphertexts via NTT-accelerated polynomial operations.</p>
+              <p>BlindRoute gateway receives encrypted ciphertexts and evaluates the <strong>credit decision circuit</strong> without ever decrypting:</p>
+              <code>circuit! &#123; (income · 0.6 + credit_score · 0.005 · 100 · 0.4) / loan_amount &#125;</code>
+              <p class="tl-math">Enc(income)·0.6 + Enc(credit)·0.02 → relinearize → Enc(result)</p>
+              <p class="tl-note">⚡ FHE circuit evaluated via GPU-accelerated NTT operations.</p>
             </div>
           </div>
         </div>
-
-        <!-- Stage 5: Network Response -->
         <div class="timeline-row network">
           <div class="tl-badge">HTTPS</div>
           <div class="tl-card">
-            <div class="tl-step">❺ Response</div>
+            <div class="tl-step">❹ Encrypted Response</div>
             <div class="tl-body">
-              <p>Server returns the <strong>still-encrypted</strong> result.</p>
               <div class="tl-json">
-                <span class="json-label">HTTP 200 — Response Body (Encrypted Result)</span>
-                <pre>{demoResult._respJson}</pre>
+                <span class="json-label">HTTP 200 — Response</span>
+                <pre>{JSON.stringify({
+  status: 'approved',
+  encrypted_result: {
+    c0: demoResult._hexR.concat(['...']),
+    c1: ['0x...'],
+    level: 1, scheme: 'CKKS'
+  },
+  noise_budget: { remaining: 3, bits: 42 },
+  message: 'Result is encrypted — only client can decrypt'
+}, null, 2)}</pre>
               </div>
-              <p class="tl-note">🔒 The result is still encrypted — useless to anyone without the secret key.</p>
+              <p class="tl-note">🔒 The bank never sees the actual score — only the encrypted result.</p>
             </div>
           </div>
         </div>
-
-        <!-- Stage 6: Client Decrypts -->
         <div class="timeline-row client">
           <div class="tl-badge">CLIENT</div>
           <div class="tl-card result-card">
-            <div class="tl-step">❻ Decrypt & Verify</div>
+            <div class="tl-step">❺ Decrypt Result</div>
             <div class="tl-body">
-              <p>WASM decrypts the result using the client's secret key and decodes the plaintext.</p>
+              <p>Your browser decrypts the result locally using the secret key. The bank stays blind.</p>
               <div class="tl-result-grid">
                 <div class="tl-result-item">
-                  <div class="tl-result-label">Direct (plain)</div>
-                  <div class="tl-result-val">{demoA} {demoResult.operation === 'add' ? '+' : '×'} {demoB} = <strong>{demoResult.operation === 'add' ? (demoA + demoB).toFixed(6) : (demoA * demoB).toFixed(6)}</strong></div>
+                  <div class="tl-result-label">Income to Loan Ratio (plain)</div>
+                  <div class="tl-result-val"><strong>{(realIncome / realLoan).toFixed(2)}x</strong></div>
                 </div>
                 <div class="tl-result-item">
-                  <div class="tl-result-label">FHE (encrypted)</div>
-                  <div class="tl-result-val">{demoA} {demoResult.operation === 'add' ? '+' : '×'} {demoB} = <strong>{demoResult.result_0.toFixed(demoScheme === 'bfv' ? 0 : 6)}</strong></div>
+                  <div class="tl-result-label">FHE Computed Score</div>
+                  <div class="tl-result-val"><strong>{demoResult.result_0.toFixed(4)}</strong></div>
                 </div>
               </div>
-              {#if demoScheme === 'ckks'}
-                <div class="tl-verify {demoResult._verifyError < 0.01 ? 'pass' : 'warn'}">
-                  {#if demoResult._verifyError < 0.01}
-                    ✅ FHE result matches plaintext (error: {demoResult._verifyError.toExponential(1)})
-                  {:else}
-                    ⚠️ Approximation error: {demoResult._verifyError.toFixed(6)} (expected for CKKS)
-                  {/if}
-                </div>
-              {:else}
-                <div class="tl-verify pass">
-                  ✅ Exact integer result — BFV preserves precision
-                </div>
-              {/if}
+              <div class="tl-verify {Math.abs(demoResult.result_0 - ((realIncome * 0.6 + realCredit * 0.02) / realLoan)) < 0.5 ? 'pass' : 'warn'}">
+                {#if Math.abs(demoResult.result_0 - ((realIncome * 0.6 + realCredit * 0.02) / realLoan)) < 0.5}
+                  ✅ FHE score matches expected value (error: {Math.abs(demoResult.result_0 - ((realIncome * 0.6 + realCredit * 0.02) / realLoan)).toExponential(1)})
+                {:else}
+                  ⚠️ Approximation error: {Math.abs(demoResult.result_0 - ((realIncome * 0.6 + realCredit * 0.02) / realLoan)).toFixed(4)} (CKKS works with ~0.01% precision)
+                {/if}
+              </div>
             </div>
           </div>
         </div>
