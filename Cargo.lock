@@ -197,6 +197,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "blindroute-macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
 name = "blindroute-ntt"
 version = "0.1.0"
 dependencies = [
@@ -221,6 +230,7 @@ dependencies = [
  "blindroute-bfv",
  "blindroute-ckks",
  "blindroute-core",
+ "blindroute-macros",
  "serde",
  "serde_json",
  "tokio",

@@ -10,6 +10,7 @@ members = [
     "crates/blindroute-bfv",
     "crates/blindroute-server",
     "crates/blindroute-client",
+    "crates/blindroute-macros",
     ".",
 ]
 default-members = ["."]
@@ -30,6 +31,7 @@ blindroute-ss = { path = "crates/blindroute-ss" }
 blindroute-ckks = { path = "crates/blindroute-ckks" }
 blindroute-core = { path = "crates/blindroute-core" }
 blindroute-bfv = { path = "crates/blindroute-bfv" }
+blindroute-macros = { path = "crates/blindroute-macros" }
 num-complex = "0.4"
 serde = { version = "1", features = ["derive"] }
 rand = "0.8"
